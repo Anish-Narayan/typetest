@@ -1,0 +1,495 @@
+:root {
+  /* Color Palette */
+  --background-color: #282c34; /* Dark background */
+  --text-color: #abb2bf;     /* Light gray text */
+  --accent-color: #61afef;   /* Blue for highlights/active elements */
+  --correct-color: #98c379;  /* Green for correct words/chars */
+  --incorrect-color: #e06c75; /* Red for incorrect words/chars */
+  --caret-color: #e5c07b;    /* Orange/yellow for cursor */
+  --border-color: #3e4451;   /* Darker gray for borders/separators */
+  --button-bg-color: #3e4451; /* Button background */
+  --button-text-color: #abb2bf; /* Button text */
+  --button-hover-bg-color: #4b5263; /* Button hover */
+
+  /* Font */
+  --font-family: 'Roboto Mono', monospace; /* Monospaced font for code-like feel */
+  --font-size: 1.5rem;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-family);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+  overflow: hidden; /* Hide scrollbar from body */
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  align-items: center;
+  width: 100%;
+  max-width: 900px;
+  padding: 2.5rem;
+  border-radius: 12px;
+  background-color: #21252b; /* Slightly lighter dark shade for app container */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+/* Header Styles */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end; /* Align title and stats at the bottom */
+  width: 100%;
+  margin-bottom: 1.5rem;
+}
+
+.header h1 {
+  font-size: 2.8rem;
+  color: var(--accent-color);
+  margin: 0;
+  letter-spacing: -1px;
+}
+
+.stats {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 1.2rem;
+  color: var(--text-color);
+}
+
+.stats div {
+  padding: 0.5rem 1rem;
+  background-color: var(--button-bg-color);
+  border-radius: 8px;
+  min-width: 90px; /* Ensure consistent width */
+  text-align: center;
+}
+
+/* Input Field */
+.input-field {
+  width: calc(100% - 4rem); /* Account for padding */
+  padding: 1.2rem 2rem;
+  font-size: var(--font-size);
+  font-family: var(--font-family);
+  border: 2px solid var(--border-color);
+  border-radius: 10px;
+  background-color: #1e2127; /* Darker input background */
+  color: var(--text-color);
+  caret-color: var(--caret-color); /* The actual cursor color */
+  outline: none;
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  text-align: center; /* Center placeholder text */
+}
+
+.input-field:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 4px rgba(97, 175, 239, 0.3); /* Soft blue glow */
+}
+
+.input-field:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  background-color: #1a1e24;
+}
+
+/* Word Container */
+.word-container {
+  display: flex;
+  flex-wrap: wrap;
+  max-height: 180px; /* Limit height to show 3-4 lines */
+  overflow: hidden; /* Hide scrollbar */
+  text-align: justify; /* Distribute words evenly */
+  line-height: 2.2rem; /* Increase line height for better readability */
+  font-size: var(--font-size);
+  padding: 1rem 0;
+  width: 100%;
+  position: relative;
+}
+
+.word-container::before,
+.word-container::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 30px; /* Height of the fade effect */
+  pointer-events: none; /* Allow clicks to pass through */
+  z-index: 1;
+}
+
+.word-container::before {
+  top: 0;
+  background: linear-gradient(to bottom, var(--background-color), rgba(var(--background-color-rgb), 0));
+}
+
+.word-container::after {
+  bottom: 0;
+  background: linear-gradient(to top, var(--background-color), rgba(var(--background-color-rgb), 0));
+}
+
+/* Individual Word Styles */
+.word {
+  margin: 0 6px; /* Spacing between words */
+  white-space: pre; /* Preserve spaces within word elements for cursor */
+  position: relative;
+  padding-bottom: 2px; /* Small padding for active word underline */
+}
+
+.word:first-child {
+  margin-left: 0;
+}
+
+.word:last-child {
+  margin-right: 0;
+}
+
+/* Active Word Styling */
+.word.active {
+  color: var(--text-color); /* Active word is a bit brighter */
+}
+
+/* Correct and Incorrect Word Backgrounds (for completed words) */
+.word.correct-word {
+  background-color: rgba(152, 195, 121, 0.1); /* Light green background */
+  border-radius: 4px;
+}
+
+.word.incorrect-word {
+  background-color: rgba(224, 108, 117, 0.1); /* Light red background */
+  border-radius: 4px;
+}
+
+/* Individual Character Styles */
+.char {
+  display: inline-block;
+  color: var(--text-color);
+  transition: color 0.05s ease-out; /* Smooth transition for character color changes */
+}
+
+.char.correct {
+  color: var(--correct-color);
+}
+
+.char.incorrect {
+  color: var(--incorrect-color);
+}
+
+/* Cursor (blinking caret) */
+.char.cursor {
+  position: relative;
+  display: inline-block; /* Ensure cursor takes up space */
+}
+
+.char.cursor::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 2px; /* Thickness of the cursor */
+  background-color: var(--caret-color);
+  animation: blink 1s step-end infinite;
+  transform: translateX(-50%); /* Center the cursor */
+}
+
+.char.cursor.extra::after {
+  left: unset; /* Reset left property */
+  right: -2px; /* Position cursor at the end of extra chars */
+}
+
+/* Animation for the blinking cursor */
+@keyframes blink {
+  from, to { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Extra characters for incorrect words */
+.char.extra {
+  color: var(--incorrect-color);
+  text-decoration: underline dashed var(--incorrect-color);
+}
+
+
+/* Restart Button */
+.restart-button {
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+  font-family: var(--font-family);
+  background-color: var(--button-bg-color);
+  color: var(--button-text-color);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+  outline: none;
+  margin-top: 1.5rem;
+}
+
+.restart-button:hover {
+  background-color: var(--button-hover-bg-color);
+  transform: translateY(-2px);
+}
+
+.restart-button:active {
+  transform: translateY(0);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .app {
+    padding: 1.5rem;
+    margin: 10px;
+  }
+
+  .header h1 {
+    font-size: 2rem;
+  }
+
+  .stats {
+    font-size: 1rem;
+    gap: 1rem;
+  }
+
+  .input-field {
+    font-size: 1.2rem;
+    padding: 1rem 1.5rem;
+  }
+
+  .word-container {
+    font-size: 1.2rem;
+    line-height: 1.8rem;
+    max-height: 150px;
+  }
+
+  .restart-button {
+    font-size: 1rem;
+    padding: 0.8rem 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .header h1 {
+    font-size: 2rem;
+  }
+
+  .stats {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .stats div {
+    min-width: 70px;
+    padding: 0.4rem 0.8rem;
+  }
+}
+/* --- New Styles for Options --- */
+
+.options {
+  display: flex;
+  flex-direction: column; /* Stack options vertically */
+  gap: 0.8rem;
+  margin-top: 1rem;
+  width: 100%; /* Take full width to center effectively */
+  align-items: center; /* Center option groups */
+  order: 2; /* Place options between H1 and Stats */
+  margin-bottom: 1.5rem;
+}
+
+/* For larger screens, align options horizontally with header elements */
+@media (min-width: 769px) {
+  .header {
+    flex-wrap: wrap; /* Allow items to wrap */
+    justify-content: space-between;
+    align-items: flex-start; /* Align header elements at start */
+  }
+  .header h1 {
+    order: 1;
+  }
+  .stats {
+    order: 3;
+    margin-top: 0;
+  }
+  .options {
+    flex-direction: row; /* Horizontal for larger screens */
+    justify-content: center; /* Center options horizontally */
+    gap: 2rem;
+    margin-top: 0; /* Remove top margin from default */
+    order: 2; /* Maintain order */
+    width: auto; /* Allow options to size content */
+  }
+}
+
+.option-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: var(--button-bg-color);
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+}
+
+.option-label {
+  color: var(--text-color);
+  font-size: 1rem;
+  margin-right: 0.5rem;
+}
+
+.option-button {
+  background-color: var(--border-color); /* Slightly different background for buttons */
+  color: var(--button-text-color);
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: var(--font-family);
+  font-size: 0.95rem;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  outline: none;
+}
+
+.option-button:hover:not(:disabled) {
+  background-color: var(--button-hover-bg-color);
+  transform: translateY(-1px);
+}
+
+.option-button.active-option {
+  background-color: var(--accent-color); /* Highlight active option */
+  color: #21252b; /* Dark text for bright accent */
+  font-weight: bold;
+}
+
+.option-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Ensure the `app` container can handle new elements and maintain spacing */
+.app {
+  /* ... existing styles ... */
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; /* Adjust overall spacing between main elements */
+  /* ... */
+}
+
+/* Adjust header spacing as well */
+.header {
+    /* ... existing styles ... */
+    margin-bottom: 0; /* No margin on header itself, gaps will handle spacing */
+}
+
+/* --- New Styles for Mode Selection --- */
+
+.mode-options {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  order: 1; /* Keep it below the H1 */
+}
+
+/* Adjust order on larger screens */
+@media (min-width: 769px) {
+    .mode-options {
+        order: 2; /* Place it between H1 and Time/Words options */
+        margin-top: 0;
+    }
+    .header h1 {
+        order: 1;
+        flex-basis: 100%; /* Force H1 to take full width */
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+}
+
+
+.mode-button {
+  background-color: var(--button-bg-color);
+  color: var(--button-text-color);
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: var(--font-family);
+  font-size: 1rem;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  outline: none;
+}
+
+.mode-button:hover:not(:disabled) {
+  background-color: var(--button-hover-bg-color);
+  transform: translateY(-1px);
+}
+
+.mode-button.active-mode {
+  background-color: var(--accent-color);
+  color: #21252b; /* Dark text for bright accent */
+  font-weight: bold;
+}
+
+.mode-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Adjust existing .options to remove margin-top if placed inside header */
+.options {
+    margin-top: 0; /* Override previous margin, as it's now handled by parent flexbox gap */
+    order: 3; /* Place options after mode buttons and H1 */
+}
+
+@media (min-width: 769px) {
+  .options {
+    flex-direction: row;
+    justify-content: center;
+    gap: 2rem;
+    order: 3; /* Maintain order */
+  }
+}
+
+/* Adjust the header layout to accommodate new elements */
+.header {
+  display: flex;
+  flex-direction: column; /* Start with column layout for small screens */
+  gap: 1rem; /* Spacing between new header elements */
+  align-items: center; /* Center items in column layout */
+  width: 100%;
+  margin-bottom: 1.5rem; /* Space below the header block */
+}
+
+/* For larger screens, adjust header layout to be more row-like */
+@media (min-width: 769px) {
+  .header {
+    flex-direction: row; /* Go back to row for larger screens */
+    flex-wrap: wrap; /* Allow items to wrap to next line if needed */
+    justify-content: space-between; /* Distribute items */
+    align-items: flex-end; /* Align stats to the bottom */
+  }
+  .header h1, .mode-options, .options, .stats {
+    flex-basis: auto; /* Reset flex basis */
+  }
+}
+
+/* Ensure stats block alignment for larger screens */
+.stats {
+    /* ... existing styles ... */
+    margin-top: 0; /* Remove any previous top margin */
+    order: 4; /* Last in the header section */
+}
