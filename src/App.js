@@ -353,7 +353,7 @@ function App() {
   return (
     <div className="app" onClick={() => inputRef.current.focus()}>
       <div className="header">
-        <h1>Type Test</h1>
+        <h1>Typing Speed Test</h1>
         <div className="option-group">
           <button
             className={`option-button ${testMode === 'time' ? 'active-option' : ''}`}
