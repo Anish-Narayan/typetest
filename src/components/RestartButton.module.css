@@ -1,0 +1,31 @@
+/* src/components/RestartButton.module.css */
+
+.restartButton { /* Changed to camelCase for JS access */
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+  font-family: var(--font-family);
+  background-color: var(--button-bg-color);
+  color: var(--button-text-color);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+  outline: none;
+  margin-top: 1.5rem;
+}
+
+.restartButton:hover {
+  background-color: var(--button-hover-bg-color);
+  transform: translateY(-2px);
+}
+
+.restartButton:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+  .restartButton {
+    font-size: 1rem;
+    padding: 0.8rem 1.5rem;
+  }
+}

@@ -1,0 +1,44 @@
+/* src/components/Header.module.css */
+
+.header { /* Renamed from .header to .header for module */
+  display: flex;
+  flex-direction: column; /* Start with column layout for small screens */
+  gap: 1rem; /* Spacing between new header elements */
+  align-items: center; /* Center items in column layout */
+  width: 100%;
+  margin-bottom: 1.5rem; /* Space below the header block */
+}
+
+.header h1 {
+  font-size: 2.8rem;
+  color: var(--accent-color);
+  margin: 0;
+  letter-spacing: -1px;
+  order: 1; /* Ensure H1 is first */
+}
+
+/* Responsive adjustments for the header layout */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: center;
+  }
+  .header h1 {
+    order: unset; /* Reset order for small screens */
+  }
+}
+
+@media (min-width: 769px) {
+  .header {
+    flex-direction: row; /* Go back to row for larger screens */
+    flex-wrap: wrap; /* Allow items to wrap to next line if needed */
+    justify-content: space-between; /* Distribute items */
+    align-items: flex-end; /* Align stats to the bottom */
+  }
+  .header h1 {
+    order: 1;
+    flex-basis: 100%; /* Force H1 to take full width */
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+}

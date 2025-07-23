@@ -1,0 +1,49 @@
+/* src/components/ModeSelector.module.css */
+
+.modeOptions { /* Changed to camelCase for JS access */
+  display: flex;
+  gap: 0.5rem;
+  order: 2; /* Place it after H1 */
+}
+
+.modeButton { /* Changed to camelCase for JS access */
+  background-color: var(--button-bg-color);
+  color: var(--button-text-color);
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: var(--font-family);
+  font-size: 1rem;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  outline: none;
+}
+
+.modeButton:hover:not(:disabled) {
+  background-color: var(--button-hover-bg-color);
+  transform: translateY(-1px);
+}
+
+.activeMode { /* Used as a separate class to be combined */
+  background-color: var(--accent-color);
+  color: #21252b; /* Dark text for bright accent */
+  font-weight: bold;
+}
+
+.modeButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .modeOptions {
+    order: unset; /* Reset order for small screens */
+  }
+}
+
+@media (min-width: 769px) {
+  .modeOptions {
+    order: 2; /* Place it between H1 and Time/Words options */
+    margin-top: 0;
+  }
+}

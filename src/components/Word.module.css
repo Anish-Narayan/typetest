@@ -1,0 +1,77 @@
+/* src/components/Word.module.css */
+
+.word { /* Changed to camelCase for JS access */
+  margin: 0 6px;
+  white-space: pre;
+  position: relative;
+  padding-bottom: 2px;
+}
+
+.word:first-child {
+  margin-left: 0;
+}
+
+.word:last-child {
+  margin-right: 0;
+}
+
+.active { /* Used as a separate class to be combined */
+  color: var(--text-color);
+}
+
+.correctWord { /* Changed to camelCase for JS access */
+  background-color: rgba(152, 195, 121, 0.1);
+  border-radius: 4px;
+}
+
+.incorrectWord { /* Changed to camelCase for JS access */
+  background-color: rgba(224, 108, 117, 0.1);
+  border-radius: 4px;
+}
+
+.char { /* Changed to camelCase for JS access */
+  display: inline-block;
+  color: var(--text-color);
+  transition: color 0.05s ease-out;
+}
+
+.char.correct { /* This specific selector format is tricky with CSS Modules, might need adjustment in JS */
+  color: var(--correct-color);
+}
+
+.char.incorrect { /* This specific selector format is tricky with CSS Modules, might need adjustment in JS */
+  color: var(--incorrect-color);
+}
+
+.char.extra { /* This specific selector format is tricky with CSS Modules, might need adjustment in JS */
+  color: var(--incorrect-color);
+  text-decoration: underline dashed var(--incorrect-color);
+}
+
+/* Cursor (blinking caret) */
+.cursor { /* Used as a separate class to be combined */
+  position: relative;
+  display: inline-block;
+}
+
+.cursor::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 2px;
+  background-color: var(--caret-color);
+  animation: blink 1s step-end infinite;
+  transform: translateX(-50%);
+}
+
+.extraCursor::after { /* Changed to camelCase for JS access */
+  left: unset;
+  right: -2px;
+}
+
+@keyframes blink {
+  from, to { opacity: 1; }
+  50% { opacity: 0; }
+}

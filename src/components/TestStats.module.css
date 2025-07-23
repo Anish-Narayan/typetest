@@ -1,0 +1,43 @@
+/* src/components/TestStats.module.css */
+
+.stats { /* Changed to camelCase for JS access */
+  display: flex;
+  gap: 1.5rem;
+  font-size: 1.2rem;
+  color: var(--text-color);
+  order: 4;
+  margin-top: 1rem;
+}
+
+.stats div {
+  padding: 0.5rem 1rem;
+  background-color: var(--button-bg-color);
+  border-radius: 8px;
+  min-width: 90px;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .stats {
+    font-size: 1rem;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .stats div {
+    min-width: 70px;
+    padding: 0.4rem 0.8rem;
+  }
+}
+
+@media (min-width: 769px) {
+  .stats {
+    order: 4;
+    margin-top: 0;
+  }
+}

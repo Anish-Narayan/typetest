@@ -1,0 +1,75 @@
+/* src/components/TestOptions.module.css */
+
+.options { /* Changed to camelCase for JS access */
+  display: flex;
+  flex-direction: column; /* Stack options vertically */
+  gap: 0.8rem;
+  width: 100%; /* Take full width to center effectively */
+  align-items: center; /* Center option groups */
+  order: 3; /* Place options after mode buttons */
+}
+
+.optionGroup { /* Changed to camelCase for JS access */
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: var(--button-bg-color);
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+}
+
+.optionLabel { /* Changed to camelCase for JS access */
+  color: var(--text-color);
+  font-size: 1rem;
+  margin-right: 0.5rem;
+}
+
+.optionButton { /* Changed to camelCase for JS access */
+  background-color: var(--border-color);
+  color: var(--button-text-color);
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: var(--font-family);
+  font-size: 0.95rem;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  outline: none;
+}
+
+.optionButton:hover:not(:disabled) {
+  background-color: var(--button-hover-bg-color);
+  transform: translateY(-1px);
+}
+
+.activeOption { /* Used as a separate class to be combined */
+  background-color: var(--accent-color);
+  color: #21252b;
+  font-weight: bold;
+}
+
+.optionButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .options {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+  .optionGroup {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (min-width: 769px) {
+  .options {
+    flex-direction: row;
+    justify-content: center;
+    gap: 2rem;
+    order: 3;
+    width: auto;
+  }
+}

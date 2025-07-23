@@ -1,0 +1,31 @@
+/* src/components/TestOverMessage.module.css */
+
+.testOverMessage { /* Changed to camelCase for JS access */
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 12px;
+  background-color: #2e323a;
+  color: var(--text-color);
+  border: 1px solid var(--correct-color);
+  text-align: center;
+  font-size: 1.2em;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.testOverMessage h2 {
+  color: var(--accent-color);
+  margin-bottom: 15px;
+  font-size: 1.8em;
+}
+
+.timeTakenDisplay { /* Changed to camelCase for JS access */
+  font-size: 1.4em;
+  font-weight: bold;
+  color: var(--caret-color);
+  margin-top: 10px;
+  padding: 8px 15px;
+  background-color: var(--button-hover-bg-color);
+  border-radius: 8px;
+  display: inline-block;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}

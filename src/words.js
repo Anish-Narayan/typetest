@@ -8,7 +8,7 @@
  * You can replace this list with any other word list you prefer.
  * For example, you could use lists with the top 1k, 5k, or 10k most frequent words.
  */
-const wordList = [
+const commonWords = [
   'the', 'be', 'of', 'and', 'a', 'to', 'in', 'he', 'have', 'it', 'that', 'for', 'they', 'with', 'as', 
   'not', 'on', 'she', 'at', 'by', 'this', 'we', 'you', 'do', 'but', 'from', 'or', 'which', 'one', 
   'would', 'all', 'will', 'there', 'say', 'who', 'make', 'when', 'can', 'more', 'if', 'no', 'man', 
@@ -465,9 +465,13 @@ const wordList = [
  * @param {number} count The number of words to generate.
  * @returns {string[]} An array of shuffled words.
  */
-const generateWords = (count) => {
-  const shuffled = wordList.sort(() => 0.5 - Math.random());
-  return shuffled.slice(0, count);
+const generateWords = (count = 50) => {
+    const words = [];
+    for (let i = 0; i < count; i++) {
+        const randomIndex = Math.floor(Math.random() * commonWords.length);
+        words.push(commonWords[randomIndex]);
+    }
+    return words;
 };
 
 export default generateWords;
