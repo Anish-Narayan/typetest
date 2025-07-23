@@ -19,6 +19,7 @@ function App() {
   // State for game status and timer
   const [status, setStatus] = useState('waiting'); // 'waiting', 'started', 'finished'
   const [timer, setTimer] = useState(30); // Dynamic: will be set by `testDuration`
+  const [timeTaken, setTimeTaken] = useState(0); // NEW: State to store time taken for word tests
 
   // State for results
   const [wpm, setWpm] = useState(0);       // Net WPM (correct characters)
@@ -56,6 +57,11 @@ function App() {
     const actualElapsedTimeSeconds = (Date.now() - startTimeRef.current) / 1000;
     const totalTimeMinutes = actualElapsedTimeSeconds / 60;
 
+    // NEW: Store time taken for 'words' mode
+    if (testMode === 'words') {
+      setTimeTaken(actualElapsedTimeSeconds);
+    }
+
     let finalCorrectChars = 0;
     let finalTotalTypedChars = 0;
 
@@ -81,7 +87,7 @@ function App() {
 
     const accuracyCalc = finalTotalTypedChars > 0 ? (finalCorrectChars / finalTotalTypedChars) * 100 : 0;
     setAccuracy(Math.round(accuracyCalc > 0 ? accuracyCalc : 0));
-  }, []); // No dependencies needed for useCallback because it uses refs now
+  }, [testMode]); // Dependency for useCallback because it uses testMode now
 
   /**
    * Resets all game state to initial values, preparing for a new test.
@@ -92,13 +98,15 @@ function App() {
       wordContainerRef.current.scrollTop = 0;
     }
 
-    setWords(generateWords(Math.max(wordCount, 200)));
+    // NEW: Generate words based on wordCount for 'words' mode, or a sufficient amount for 'time' mode
+    setWords(generateWords(testMode === 'words' ? wordCount : 200));
     setActiveWordIndex(0);
     setUserInput('');
     setCorrectWordArray([]);
     setTypedCharState([]);
     setStatus('waiting');
     setTimer(testDuration);
+    setTimeTaken(0); // Reset time taken
     setWpm(0);
     setRawWpm(0);
     setAccuracy(0);
@@ -114,7 +122,7 @@ function App() {
     if (inputRef.current) {
       inputRef.current.focus();
     }
-  }, [testDuration, wordCount]);
+  }, [testDuration, wordCount, testMode]); // Added testMode as dependency
 
   // Effect to initialize game on component mount and when resetGame changes
   useEffect(() => {
@@ -175,7 +183,7 @@ function App() {
 
     // Cleanup function for interval
     return () => clearInterval(interval);
-  }, [status, testMode, testDuration, calculateRealtimeStats, calculateResults]); // Dependencies are now minimal and don't include character counts
+  }, [status, testMode, calculateRealtimeStats, calculateResults]); // Dependencies are now minimal and don't include character counts
 
 
   /**
@@ -209,12 +217,18 @@ function App() {
     if (status === 'finished') return;
 
     const value = e.target.value;
-    const currentWord = words[activeWordIndex];
+    // NEW: Ensure we only get words up to the wordCount for 'words' mode
+    const currentWord = testMode === 'words' ? words[activeWordIndex] : words[activeWordIndex];
 
     if (status === 'waiting' && value.length === 1 && currentWord && value.trim() !== '') {
       setStatus('started');
       startTimeRef.current = Date.now();
-      setTimer(testDuration);
+      // NEW: For 'words' mode, timer should not decrement but we'll show time taken at end
+      if (testMode === 'words') {
+        setTimer(0); // Or some indicator that it's not a countdown
+      } else {
+        setTimer(testDuration);
+      }
     }
 
     if (status !== 'started' || !currentWord) {
@@ -245,13 +259,15 @@ function App() {
         return newTypedCharState;
       });
 
-      setActiveWordIndex(activeWordIndex + 1);
+      const nextActiveWordIndex = activeWordIndex + 1;
+      setActiveWordIndex(nextActiveWordIndex);
       setUserInput('');
 
-      if (testMode === 'words' && activeWordIndex + 1 >= wordCount) {
+      // NEW: Check for end condition based on word count
+      if (testMode === 'words' && nextActiveWordIndex >= wordCount) {
         setStatus('finished');
         calculateResults();
-        setTimer(0);
+        // The timer will already be at 0 or irrelevant for 'words' mode, so no need to set it.
       }
 
     } else {
@@ -410,6 +426,7 @@ function App() {
         {status === 'finished' && (
           <div className="test-over-message">
             <h2>Test Over!</h2>
+            {testMode === 'words' && <p>Time Taken: {timeTaken.toFixed(1)}s</p>} {/* Display time taken */}
           </div>
         )}
 
@@ -438,7 +455,8 @@ function App() {
       />
 
       <div className="word-container" ref={wordContainerRef}>
-        {words.map((word, wordIndex) => (
+        {/* NEW: Slice the words array to only display the chosen word count */}
+        {words.slice(0, wordCount).map((word, wordIndex) => (
           <Word
             key={wordIndex}
             word={word}
