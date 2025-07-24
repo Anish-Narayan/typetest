@@ -41,3 +41,18 @@
     margin-top: 0;
   }
 }
+/* In TestStats.module.css */
+.stats {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: #63a5f6;
+}
+
+/* Style for the timer/word count when the test is active */
+.focusStat {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #63a5f6; /* Example color */
+}

@@ -1,77 +1,90 @@
 import { useEffect, useCallback } from 'react';
 
 /**
- * Custom hook for managing the game timer and calculating real-time WPM/Accuracy.
- * This hook causes side effects (timer interval) and calls setters from its parent hook.
+ * Manages the game timer and calculates the final WPM/Accuracy when the test is over.
  *
- * @param {string} status - Current game status ('waiting', 'started', 'finished').
- * @param {string} testMode - Current test mode ('time' or 'words').
- * @param {React.MutableRefObject} startTimeRef - Ref to store the test start timestamp.
- * @param {React.MutableRefObject} correctTypedCharsRef - Ref for current correct characters (owned by useGameInitialization).
- * @param {React.MutableRefObject} totalTypedCharsRef - Ref for current total typed characters (owned by useGameInitialization).
- * @param {function} setStatus - Function to update game status (owned by useGameInitialization).
- * @param {function} setTimer - Function to update timer state (owned by useGameInitialization).
- * @param {function} setWpm - Function to update WPM state (owned by useTypingTest).
- * @param {function} setRawWpm - Function to update Raw WPM state (owned by useTypingTest).
- * @param {function} setAccuracy - Function to update Accuracy state (owned by useTypingTest).
- * @param {function} calculateFinalResults - Callback to calculate final results (owned by useTypingTest).
- * @returns {void} This hook doesn't return any state, as its primary purpose is side effects and updating parent state.
+ * This hook has two main responsibilities:
+ * 1.  If the test mode is 'time', it sets up a one-second interval to handle the countdown.
+ *     When the timer reaches zero, it sets the game status to 'finished'.
+ * 2.  It watches for the game status to become 'finished'. When it does, it performs a
+ *     one-time calculation of the final WPM, Raw WPM, and Accuracy and updates the parent state.
+ *
+ * This version is more performant as it avoids recalculating stats on every second of the test.
+ *
+ * @param {string} status - The current status of the typing test ('waiting', 'started', 'finished').
+ * @param {string} testMode - The selected test mode ('time' or 'words').
+ * @param {React.MutableRefObject<number>} startTimeRef - A ref holding the timestamp when the test started.
+ * @param {React.MutableRefObject<number>} correctTypedCharsRef - A ref holding the count of correctly typed characters.
+ * @param {React.MutableRefObject<number>} totalTypedCharsRef - A ref holding the total number of characters typed.
+ * @param {function(string): void} setStatus - State setter to update the game's status.
+ * @param {function(React.SetStateAction<number>): void} setTimer - State setter to update the timer's value.
+ * @param {function(number): void} setWpm - State setter to update the final net Words Per Minute.
+ * @param {function(number): void} setRawWpm - State setter to update the final raw Words Per Minute.
+ * @param {function(number): void} setAccuracy - State setter to update the final typing accuracy percentage.
+ * @returns {void} This hook does not return any value; it operates via side effects.
  */
 const useTimerAndStats = (
   status, testMode,
   startTimeRef, correctTypedCharsRef, totalTypedCharsRef,
   setStatus, setTimer,
-  setWpm, setRawWpm, setAccuracy,
-  calculateFinalResults
+  setWpm, setRawWpm, setAccuracy
 ) => {
 
-  const calculateRealtimeStats = useCallback(() => {
-    // Ensure test has started and there's elapsed time to prevent division by zero
+  // Calculates the final statistics based on the total time and character counts.
+  const calculateFinalStats = useCallback(() => {
+    // Ensure test has started and there's elapsed time to prevent division by zero.
     if (startTimeRef.current === 0) return;
 
+    // Use the final time for calculation. For 'words' mode, this is the total elapsed time.
+    // For 'time' mode, it's the full duration of the test.
     const elapsedTime = (Date.now() - startTimeRef.current) / 1000;
     if (elapsedTime === 0) return;
 
     const timeMinutes = elapsedTime / 60;
 
-    const currentNetWpm = (correctTypedCharsRef.current / 5) / timeMinutes;
-    setWpm(Math.round(currentNetWpm > 0 ? currentNetWpm : 0));
+    const finalNetWpm = (correctTypedCharsRef.current / 5) / timeMinutes;
+    setWpm(Math.round(finalNetWpm > 0 ? finalNetWpm : 0));
 
-    const currentRawWpm = (totalTypedCharsRef.current / 5) / timeMinutes;
-    setRawWpm(Math.round(currentRawWpm > 0 ? currentRawWpm : 0));
+    const finalRawWpm = (totalTypedCharsRef.current / 5) / timeMinutes;
+    setRawWpm(Math.round(finalRawWpm > 0 ? finalRawWpm : 0));
 
-    const currentAccuracy = totalTypedCharsRef.current > 0 ? (correctTypedCharsRef.current / totalTypedCharsRef.current) * 100 : 0;
-    setAccuracy(Math.round(currentAccuracy > 0 ? currentAccuracy : 0));
+    const finalAccuracy = totalTypedCharsRef.current > 0
+      ? (correctTypedCharsRef.current / totalTypedCharsRef.current) * 100
+      : 0;
+    setAccuracy(Math.round(finalAccuracy > 0 ? finalAccuracy : 0));
+
   }, [setWpm, setRawWpm, setAccuracy, startTimeRef, correctTypedCharsRef, totalTypedCharsRef]);
 
-  // Main timer and stats update effect
+
+  // Effect for managing the countdown timer in 'time' mode.
   useEffect(() => {
     let interval;
 
-    if (status === 'started') {
+    if (status === 'started' && testMode === 'time') {
       interval = setInterval(() => {
-        calculateRealtimeStats(); // Update real-time stats
-
-        // For 'time' mode, also decrement the timer and check for end condition
-        if (testMode === 'time') {
-          setTimer((prevTimer) => {
-            if (prevTimer === 1) {
-              clearInterval(interval);
-              setStatus('finished');
-              calculateFinalResults(); // Call final results calculation
-              return 0;
-            }
-            return prevTimer - 1;
-          });
-        }
-      }, 1000); // Update every second
+        setTimer((prevTimer) => {
+          if (prevTimer <= 1) {
+            clearInterval(interval);
+            setStatus('finished'); // End the game
+            return 0;
+          }
+          return prevTimer - 1;
+        });
+      }, 1000);
     }
 
-    // Cleanup function for interval when component unmounts or dependencies change
     return () => clearInterval(interval);
-  }, [status, testMode, setTimer, setStatus, calculateRealtimeStats, calculateFinalResults]);
+  }, [status, testMode, setTimer, setStatus]);
 
-  // This hook primarily manages side effects and updates parent state, so it doesn't return its own state.
+
+  // Effect for calculating results when the game finishes.
+  useEffect(() => {
+    if (status === 'finished') {
+      calculateFinalStats();
+    }
+  }, [status, calculateFinalStats]);
+
+  // This hook primarily manages side effects and updates parent state.
   return {};
 };
 
